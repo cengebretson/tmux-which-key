@@ -10,23 +10,6 @@ memorization and increasing feature discoverability.
 
 ![Demo](https://vhs.charm.sh/vhs-7cpM1K8aaWiy7CTJ8Odide.gif)
 
-<!-- markdownlint-disable MD033 -->
-<details>
-<summary>Key presses</summary>
-
-| Key | Action           |
-| --- | ---------------- |
-| w   | Windows menu     |
-| /   | Split horizontal |
-
-| Key | Action     |
-| --- | ---------- |
-| p   | Panes menu |
-| h   | Left pane  |
-
-</details>
-<!-- markdownlint-enable MD033 -->
-
 ## ✨ Features
 
 - An action menu with many of the common tmux commands
@@ -162,7 +145,7 @@ with a wizard to complete the installation.
 <details>
 <summary>Installation steps</summary>
 
-1. Clone this repository flag using the `--recursive` flag:
+1. Clone this repository using the `--recursive` flag:
 
 ```sh
 git clone --recursive https://github.com/alexwforsythe/tmux-which-key $HOME/.tmux/plugins/
@@ -293,52 +276,6 @@ set -g @plugin 'alexwforsythe/tmux-which-key'
 
 This allows the plugin to also be used with immutable or declarative operating
 systems.
-
-<!-- markdownlint-disable MD033 -->
-<details>
-<summary>Example Home Manager Nix Config</summary>
-
-```nix
-{
-  lib,
-  pkgs,
-  ...
-}: let
-  tmux-which-key =
-    pkgs.tmuxPlugins.mkTmuxPlugin
-    {
-      pluginName = "tmux-which-key";
-      version = "2024-01-10";
-      src = pkgs.fetchFromGitHub {
-        owner = "tmux";
-        repo = "tmux-which-key";
-        rev = "<commit hash>";
-        sha256 = lib.fakeSha256;
-      };
-      rtpFilePath = "plugin.sh.tmux";
-    };
-in {
-  xdg.configFile = {
-    "tmux/plugins/tmux-which-key/config.yaml".text = lib.generators.toYAML {} {
-      command_alias_start_index = 200;
-      # rest of config here
-    };
-  };
-  programs.tmux.plugins = [
-    {
-      plugin = tmux-which-key;
-      extraConfig = ''
-        set -g @tmux-which-key-xdg-enable 1;
-      '';
-    }
-  ];
-}
-```
-
-</details>
-<!-- markdownlint-enable MD033 -->
-
-<!-- markdownlint-disable MD024 -->
 
 ### Manual config
 
