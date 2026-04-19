@@ -26,7 +26,7 @@ make_xdg_path() {
     for dir in $1; do
         current_dir="$current_dir/$dir"
         # only create the directory and apply the mode it doesn't exist
-        if [ ! -d "$current_dir/$dir" ]; then
+        if [ ! -d "$current_dir" ]; then
             # shellcheck disable=SC2174
             # applying the mode to the deepest directory is intentional
             mkdir -m 0700 -p "$current_dir"

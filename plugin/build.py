@@ -174,7 +174,7 @@ class MenuItem(object):
             assert self.key, 'item {} is missing a keybinding'.format(
                 self.name)
             # Escape special key characters.
-            has_special_key_char = True
+            has_special_key_char = False
             for k in special_key_chars:
                 if k in self.key:
                     has_special_key_char = True
