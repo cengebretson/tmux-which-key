@@ -1,5 +1,4 @@
 ---
-# yaml-language-server: $schema=config.schema.yaml
 command_alias_start_index: 200
 keybindings:
   # root_table: C-Space
@@ -17,7 +16,7 @@ custom_variables:
 macros:
   - name: reload-config
     commands:
-      - display "#{log_info} Loading config... "
+      - display "#{log_info} Config files: #{config_files}"
       - source-file -q "$HOME/.tmux.conf"
       - source-file -q "$HOME/.config/tmux/tmux.conf"
       - display -p "\n\n... Press ENTER to continue"

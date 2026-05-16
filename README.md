@@ -133,7 +133,7 @@ Requirements:
 Add the plugin to the list of TPM plugins in your `~/.tmux.conf`:
 
 ```tmux
-set -g @plugin 'alexwforsythe/tmux-which-key'
+set -g @plugin 'cengebretson/tmux-which-key'
 ```
 
 Hit `prefix` + <kbd>I</kbd> to install and load the plugin. You'll be presented
@@ -145,10 +145,10 @@ with a wizard to complete the installation.
 <details>
 <summary>Installation steps</summary>
 
-1. Clone this repository using the `--recursive` flag:
+1. Clone this repository:
 
 ```sh
-git clone --recursive https://github.com/alexwforsythe/tmux-which-key $HOME/.tmux/plugins/
+git clone https://github.com/cengebretson/tmux-which-key $HOME/.tmux/plugins/
 ```
 
 2. Register the plugin in your `~/.tmux.conf`:
@@ -251,7 +251,7 @@ this to your `~/.tmux.conf` **before** loading the plugin:
 ```tmux
 set -g @tmux-which-key-disable-autobuild 1
 # ...
-set -g @plugin 'alexwforsythe/tmux-which-key'
+set -g @plugin 'cengebretson/tmux-which-key'
 ```
 
 ##### @tmux-which-key-xdg-enable
@@ -272,7 +272,7 @@ set -g @tmux-which-key-xdg-plugin-path tmux/plugins/tmux-which-key # default
 
 # ...
 
-set -g @plugin 'alexwforsythe/tmux-which-key'
+set -g @plugin 'cengebretson/tmux-which-key'
 ```
 
 This allows the plugin to also be used with immutable or declarative operating
@@ -284,8 +284,8 @@ You can customize the action menu by editing `plugin/init.tmux` directly.
 
 > [!TIP]
 >
-> I strongly recommend using YAML to customize your action menu because editing
-> tmux script can be error-prone and difficult to debug.
+> I strongly recommend using the YAML config to customize your action menu because
+> editing tmux script can be error-prone and difficult to debug.
 
 ### Zsh
 

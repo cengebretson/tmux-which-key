@@ -20,7 +20,7 @@ After rebuilding, reload in a live tmux session:
 tmux source-file plugin/init.tmux
 ```
 
-There is no Makefile, test suite, or linter. The Python version is pinned to 3.8 (see `.python-version`); PyYAML is bundled as a git submodule at `plugin/pyyaml/`.
+There is no Makefile, test suite, or linter. The Python version is pinned to 3.8 (see `.python-version`); PyYAML must be installed (`python3 -m pip install pyyaml`) — it is typically pre-installed on most systems.
 
 ## Architecture
 
@@ -28,7 +28,6 @@ There is no Makefile, test suite, or linter. The Python version is pinned to 3.8
 plugin.sh.tmux      # TPM entry point — copies example configs, runs build.py, sources init.tmux
 plugin/build.py     # Python builder: parses config.yaml, emits tmux script
 config.example.yaml # User-facing config template (gitignored config.yaml is the live copy)
-config.schema.yaml  # JSON Schema for config.yaml (used by VS Code YAML extension)
 plugin/init.tmux    # Generated output — do not edit by hand (gitignored)
 ```
 

@@ -8,15 +8,15 @@ from pathlib import Path
 from typing import List, Optional
 
 try:
-    from pyyaml.lib import yaml
+    import yaml
 except ModuleNotFoundError:
-    try:
-        import yaml
-    except ModuleNotFoundError:
-        raise SystemExit(
-            'PyYAML not found. Run "git submodule update --init --recursive" '
-            'or install PyYAML for your Python environment.'
-        )
+    raise SystemExit(
+        'PyYAML not found. Install it with one of:\n'
+        '  python3 -m pip install pyyaml  # installs for the python3 in your PATH\n'
+        '  brew install pyyaml            # macOS\n'
+        '  apt install python3-yaml       # Debian/Ubuntu\n'
+        '  dnf install python3-pyyaml    # Fedora/RHEL'
+    )
 
 special_key_chars: List[str] = ['~']
 
