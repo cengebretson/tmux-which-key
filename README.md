@@ -213,13 +213,14 @@ position:
 # tmux-only environment variables that can be used in commands and macros
 # (optional)
 custom_variables:
-  my_var: my_value
+  - name: my_var
+    value: my_value
 # User-defined macros that can be triggered by the menu (optional)
 macros:
-  restart-pane: # The macro name
-    # The macro commands
-    - "respawnp -k -c #{pane_current_path}"
-    - display "#{log_info} Pane restarted"
+  - name: restart-pane # The macro name
+    commands: # The macro commands
+      - "respawnp -k -c #{pane_current_path}"
+      - display "#{log_info} Pane restarted"
 # The root menu items (required)
 items:
   - name: Next pane
