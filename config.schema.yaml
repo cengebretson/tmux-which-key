@@ -201,45 +201,59 @@ properties:
     type: array
     title:
       tmux-only environment variables that can be used in commands and macros
-    properties:
-      name:
-        type: string
-        title: The environment variable name
-      value:
-        type: string
-        title: The environment variable value
-        examples:
-          - my_env_var: my_value
+    items:
+      type: object
+      required:
+        - name
+        - value
+      properties:
+        name:
+          type: string
+          title: The environment variable name
+        value:
+          type: string
+          title: The environment variable value
+          examples:
+            - my_value
     examples:
-      - - my_env_var: my_value
+      - - name: my_var
+          value: my_value
   macros:
     type: array
     title: The user macros
-    properties:
-      name:
-        type: string
-        title: The macro name
-        examples:
-          - my-macro
-      commands:
-        type: array
-        title: The macro commands
-        items:
+    items:
+      type: object
+      required:
+        - name
+        - commands
+      properties:
+        name:
           type: string
-          title: A command value
+          title: The macro name
           examples:
-            - source-file $HOME/.tmux.conf
-        examples:
-          - - 'display "[info] Loading config... "'
-            - source-file $HOME/.tmux.conf
-            - 'display -p "[info] Done\n\n... Press <Enter> to close"'
-            - 'display "[info] Config loaded "'
+            - my-macro
+        commands:
+          type: array
+          title: The macro commands
+          items:
+            type: string
+            title: A command value
+            examples:
+              - source-file -q "$HOME/.tmux.conf"
+          examples:
+            - - 'display "[info] Loading config... "'
+              - source-file -q "$HOME/.tmux.conf"
+              - source-file -q "$HOME/.config/tmux/tmux.conf"
+              - 'display -p "[info] Done\n\n... Press <Enter> to close"'
+              - 'display "[info] Config loaded "'
     examples:
-      - reload-config:
-          - 'display "[log_info] Loading config... "'
-          - source-file $HOME/.tmux.conf
-          - 'display -p "[info] Done\n\n... Press <Enter> to close"'
-          - 'display "[log_info] Config loaded "'
+      - - name: reload-config
+          commands:
+            - 'display "[log_info] Loading config... "'
+            - source-file -q "$HOME/.tmux.conf"
+            - source-file -q "$HOME/.config/tmux/tmux.conf"
+            - 'display -p "[info] Done\n\n... Press <Enter> to close"'
+            - 'display "[log_info] Config loaded "'
   items:
     type: array
     title: The menu items

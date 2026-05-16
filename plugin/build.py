@@ -7,7 +7,16 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import List, Optional
 
-from pyyaml.lib import yaml
+try:
+    from pyyaml.lib import yaml
+except ModuleNotFoundError:
+    try:
+        import yaml
+    except ModuleNotFoundError:
+        raise SystemExit(
+            'PyYAML not found. Run "git submodule update --init --recursive" '
+            'or install PyYAML for your Python environment.'
+        )
 
 special_key_chars: List[str] = ['~']
 
@@ -232,16 +241,26 @@ class Config(object):
         self,
         command_alias_start_index: int,
         keybindings: dict,
-        title: dict,
-        position: dict,
-        custom_variables: List[dict],
-        macros: List[dict],
-        items: List[dict]
+        items: List[dict],
+        title: Optional[dict] = None,
+        position: Optional[dict] = None,
+        custom_variables: Optional[List[dict]] = None,
+        macros: Optional[List[dict]] = None,
     ) -> None:
         # Aliases must start at 200 or greater because the tmux manpage examples
         # start at 100, so we assume 100-199 may already be in use.
         assert command_alias_start_index >= 200, 'command_alias_start_index must be at least 200'
         self.command_alias_start_index = command_alias_start_index
+
+        title = title or {}
+        title = {
+            'style': title.get('style', 'align=centre,bold'),
+            'prefix': title.get('prefix', 'tmux'),
+            'prefix_style': title.get('prefix_style', 'fg=green,align=centre,bold'),
+        }
+        position = position or {'x': 'R', 'y': 'P'}
+        custom_variables = custom_variables or []
+        macros = macros or []
 
         self.keybindings = Keybindings(**keybindings)
         self.title = title

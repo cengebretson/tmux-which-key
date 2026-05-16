@@ -18,7 +18,8 @@ macros:
   - name: reload-config
     commands:
       - display "#{log_info} Loading config... "
-      - source-file $HOME/.tmux.conf
+      - source-file -q "$HOME/.tmux.conf"
+      - source-file -q "$HOME/.config/tmux/tmux.conf"
       - display -p "\n\n... Press ENTER to continue"
   - name: restart-pane
     commands:

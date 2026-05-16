@@ -152,7 +152,8 @@ set -gF command-alias[201] show-wk-menu-root=\
 
 set -gF command-alias[202] reload-config=\
 'display "#{log_info} Loading config... " ; \
-source-file $HOME/.tmux.conf ; \
+source-file -q "$HOME/.tmux.conf" ; \
+source-file -q "$HOME/.config/tmux/tmux.conf" ; \
 display -p "\n\n... Press ENTER to continue"'
 
 set -gF command-alias[203] restart-pane=\
