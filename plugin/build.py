@@ -18,6 +18,33 @@ except ModuleNotFoundError:
         '  dnf install python3-pyyaml    # Fedora/RHEL'
     )
 
+
+class ConfigError(Exception):
+    pass
+
+
+class _DuplicateKeyLoader(yaml.SafeLoader):
+    pass
+
+
+def _construct_mapping(loader, node):
+    loader.flatten_mapping(node)
+    pairs = loader.construct_pairs(node, deep=True)
+    keys_seen = {}
+    for key, _ in pairs:
+        if key in keys_seen:
+            raise ConfigError(
+                'duplicate key "{}" at line {}'.format(key, node.start_mark.line + 1)
+            )
+        keys_seen[key] = True
+    return dict(pairs)
+
+
+_DuplicateKeyLoader.add_constructor(
+    yaml.resolver.BaseResolver.DEFAULT_MAPPING_TAG,
+    _construct_mapping,
+)
+
 special_key_chars: List[str] = ['~']
 
 template: str = (
@@ -98,7 +125,8 @@ class Keybindings(object):
     root_table: str = ''
 
     def __post_init__(self):
-        assert self.prefix_table
+        if not self.prefix_table:
+            raise ConfigError('keybindings.prefix_table is required')
 
     def __str__(self) -> str:
         # `bind-key` doesn't support formats, so we use `run-shell` to inject
@@ -120,8 +148,14 @@ class Position(object):
     y: str
 
     def __post_init__(self):
-        assert self.x in ['C', 'R', 'P', 'M', 'W']
-        assert self.y in ['C', 'P', 'M', 'W', 'S']
+        if self.x not in ['C', 'R', 'P', 'M', 'W']:
+            raise ConfigError(
+                'position.x must be one of C, R, P, M, W — got "{}"'.format(self.x)
+            )
+        if self.y not in ['C', 'P', 'M', 'W', 'S']:
+            raise ConfigError(
+                'position.y must be one of C, P, M, W, S — got "{}"'.format(self.y)
+            )
 
 
 @dataclass
@@ -151,10 +185,10 @@ class Macro(object):
     commands: List[str]
 
     def __post_init__(self):
-        assert all(c for c in self.name if c.isalnum() or c in [
-                   '-', '_']), 'macro has invalid name: {}'.format(self.name)
-        assert isinstance(self.commands, list), 'macro {} has no commands'.format(
-            self.name)
+        if not all(c.isalnum() or c in ['-', '_'] for c in self.name):
+            raise ConfigError('macro has invalid name: "{}". Names must be alphanumeric with - or _'.format(self.name))
+        if not isinstance(self.commands, list):
+            raise ConfigError('macro "{}" must have a commands list'.format(self.name))
 
     def __str__(self) -> str:
         return "set -gF command-alias[{}] {}=\\\n'{}'".format(
@@ -177,11 +211,12 @@ class MenuItem(object):
             self,
     ):
         if not self.separator:
-            assert self.name, 'item must have a name'
+            if not self.name:
+                raise ConfigError('item is missing a name')
             self.name = add_quotes(self.name)
 
-            assert self.key, 'item {} is missing a keybinding'.format(
-                self.name)
+            if not self.key:
+                raise ConfigError('item "{}" is missing a key'.format(self.name))
             # Escape special key characters.
             has_special_key_char = False
             for k in special_key_chars:
@@ -193,26 +228,31 @@ class MenuItem(object):
                 self.key = '"{}"'.format(self.key)
 
         if self.menu:
-            assert self.name and not (self.macro or self.command)
-            assert len(self.menu) > 0, 'menu {} has no commands'.format(
-                self.name)
+            if not self.name or self.macro or self.command:
+                raise ConfigError('submenu item must have only a name, key, and menu')
+            if len(self.menu) == 0:
+                raise ConfigError('submenu "{}" has no items'.format(self.name))
             # Assign an alphanumeric menu ID for use in tmux user options.
             self.menu_id = ''.join(
                 [c for c in self.name if c.isalnum() or c in ['-', '_']]).lower()
             self.command = 'show-wk-menu #{{@wk_menu_{}}}'.format(
                 self.menu_id)
         elif self.macro:
-            assert not (self.menu or self.command)
+            if self.menu or self.command:
+                raise ConfigError('item "{}" must have only one of: menu, macro, command'.format(self.name))
             self.command = self.macro
         elif self.command:
-            assert not (self.menu or self.macro)
+            if self.menu or self.macro:
+                raise ConfigError('item "{}" must have only one of: menu, macro, command'.format(self.name))
         elif self.separator:
-            assert not (self.key or self.menu or self.macro or self.command)
+            if self.key or self.menu or self.macro or self.command:
+                raise ConfigError('separator items must not have other fields')
         else:
-            raise TypeError(self)
+            raise ConfigError('item "{}" must have one of: menu, macro, command'.format(self.name))
 
         if self.transient:
-            assert self.parent_menu_id
+            if not self.parent_menu_id:
+                raise ConfigError('transient item "{}" has no parent menu'.format(self.name))
             self.command = '{} ; show-wk-menu #{{@wk_menu_{}}}'.format(
                 self.command, self.parent_menu_id)
 
@@ -247,9 +287,11 @@ class Config(object):
         custom_variables: Optional[List[dict]] = None,
         macros: Optional[List[dict]] = None,
     ) -> None:
-        # Aliases must start at 200 or greater because the tmux manpage examples
-        # start at 100, so we assume 100-199 may already be in use.
-        assert command_alias_start_index >= 200, 'command_alias_start_index must be at least 200'
+        if command_alias_start_index < 200:
+            raise ConfigError(
+                'command_alias_start_index must be >= 200 (got {}). '
+                'Indices 100-199 are reserved by tmux examples.'.format(command_alias_start_index)
+            )
         self.command_alias_start_index = command_alias_start_index
 
         title = title or {}
@@ -298,8 +340,11 @@ class Config(object):
 
     def register_menu(self, name: str, id: str, items: List[dict]):
         menu = Menu(name, id, items=[])
-        assert menu.id not in self.menu_ids, 'a menu was already registered with ID: {}'.format(
-            menu.id)
+        if menu.id in self.menu_ids:
+            raise ConfigError(
+                'menu ID collision: "{}" and another menu both produce the ID "{}". '
+                'Rename one of them.'.format(name, menu.id)
+            )
         self.menu_ids.add(menu.id)
 
         mapped_keys = set()
@@ -309,12 +354,17 @@ class Config(object):
                 assert item.name
                 self.register_menu(item.name, item.menu_id, item.menu)
             elif item.macro:
-                assert item.macro in self.macro_names, 'item {} has unknown macro: {}'.format(
-                    item.name, item.macro)
+                if item.macro not in self.macro_names:
+                    raise ConfigError(
+                        'item "{}" references unknown macro "{}". '
+                        'Defined macros: {}'.format(item.name, item.macro, ', '.join(sorted(self.macro_names)))
+                    )
 
             if item.key:
-                assert item.key not in mapped_keys, 'keybinding {} was already registered in menu {}'.format(
-                    item.key, name)
+                if item.key in mapped_keys:
+                    raise ConfigError(
+                        'duplicate key "{}" in menu "{}"'.format(item.key, name)
+                    )
             mapped_keys.add(item.key)
 
             menu.items.append(item)
@@ -339,23 +389,39 @@ def main() -> int:
     parser.add_argument(
         "config_file", help="The plugin config file", type=Path)
     parser.add_argument(
-        "output_file", help="The file where plugin init script will be written", type=Path)
+        "output_file", nargs='?', help="The file where plugin init script will be written", type=Path)
+    parser.add_argument(
+        "--validate", action="store_true",
+        help="Validate config only — do not write output")
     args = parser.parse_args()
 
-    logging.info('Reading configuration ...')
-    with open(args.config_file) as config_file:
-        data = yaml.safe_load(config_file)
-    assert isinstance(data, dict), 'the contents of config_file must be a map'
+    if not args.validate and args.output_file is None:
+        parser.error("output_file is required unless --validate is set")
 
-    logging.info('Building menu ...')
-    config = Config(**data)
+    try:
+        logging.info('Reading configuration ...')
+        with open(args.config_file) as config_file:
+            data = yaml.load(config_file, Loader=_DuplicateKeyLoader)
+        if not isinstance(data, dict):
+            raise ConfigError('config file must be a YAML mapping at the top level')
+
+        logging.info('Building menu ...')
+        config = Config(**data)
+
+    except ConfigError as e:
+        raise SystemExit('[tmux-which-key] Config error: {}'.format(e))
+    except TypeError as e:
+        raise SystemExit('[tmux-which-key] Config error: unexpected field — {}'.format(e))
+
+    if args.validate:
+        logging.info('Config is valid')
+        return 0
+
     out = str(config)
-
     with open(args.output_file, 'w+') as output_file:
         output_file.write(out)
 
     logging.info('Done')
-
     return 0
 
 

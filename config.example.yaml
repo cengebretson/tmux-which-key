@@ -16,7 +16,7 @@ custom_variables:
 macros:
   - name: reload-config
     commands:
-      - display "#{log_info} Config files: #{config_files}"
+      - 'display "#{log_info} Config files: #{config_files}"'
       - source-file -q "$HOME/.tmux.conf"
       - source-file -q "$HOME/.config/tmux/tmux.conf"
       - display -p "\n\n... Press ENTER to continue"

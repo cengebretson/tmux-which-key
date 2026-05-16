@@ -94,11 +94,13 @@ fi
 case "$(tmux show-option -gvq @tmux-which-key-disable-autobuild)" in
     1 | true) ;;
     *)
-        echo "[tmux-which-key] Rebuilding menu ..."
-        if command -v python3 >/dev/null; then
-            "$plugin_dir/build.py" "$config_file" "$init_file"
-        else
-            echo "[tmux-which-key] python3 not found"
+        if [ "$config_file" -nt "$init_file" ]; then
+            echo "[tmux-which-key] Rebuilding menu ..."
+            if command -v python3 >/dev/null; then
+                "$plugin_dir/build.py" "$config_file" "$init_file"
+            else
+                echo "[tmux-which-key] python3 not found"
+            fi
         fi
         ;;
 esac
