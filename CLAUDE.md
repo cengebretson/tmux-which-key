@@ -20,7 +20,13 @@ After rebuilding, reload in a live tmux session:
 tmux source-file plugin/init.tmux
 ```
 
-There is no Makefile, test suite, or linter. The Python version is pinned to 3.8 (see `.python-version`); PyYAML must be installed (`python3 -m pip install pyyaml`) — it is typically pre-installed on most systems.
+The Python version is pinned to 3.8 (see `.python-version`); PyYAML must be installed (`python3 -m pip install pyyaml`) — it is typically pre-installed on most systems.
+
+Run the Python tests with:
+
+```bash
+python3 -m unittest discover -s tests
+```
 
 ## Architecture
 

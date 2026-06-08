@@ -126,7 +126,7 @@ Here are a few examples of the plugin in action:
 Requirements:
 
 - tmux>=3.0
-- python>=3.8 (optional)
+- python>=3.8 for YAML config rebuilds or XDG path support
 
 ### TPM ([Tmux Plugin Manager](https://github.com/tmux-plugins/tpm/tree/master#installing-plugins))
 
@@ -277,6 +277,11 @@ set -g @plugin 'cengebretson/tmux-which-key'
 
 This allows the plugin to also be used with immutable or declarative operating
 systems.
+
+> [!NOTE]
+>
+> XDG path support uses python3 for portable path resolution on macOS, Linux,
+> and other Unix-like systems.
 
 ### Manual config
 

@@ -1,7 +1,7 @@
 ---
 command_alias_start_index: 200
 keybindings:
-  # root_table: C-Space
+  root_table: C-Space
   prefix_table: Space
 title:
   style: align=centre,bold

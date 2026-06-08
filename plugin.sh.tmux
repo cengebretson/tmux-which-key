@@ -35,6 +35,33 @@ make_xdg_path() {
     IFS=$OLDIFS
 }
 
+home_relative_path() {
+    if ! command -v python3 >/dev/null; then
+        echo "[tmux-which-key] python3 not found; XDG path resolution requires python3" >&2
+        return 1
+    fi
+
+    python3 -c '
+import sys
+from pathlib import Path
+
+home = Path(sys.argv[1]).expanduser().resolve(strict=False)
+base = Path(sys.argv[2]).expanduser()
+plugin_path = Path(sys.argv[3])
+
+if plugin_path.is_absolute():
+    raise SystemExit("[tmux-which-key] XDG plugin path must be relative")
+
+target = (base / plugin_path).resolve(strict=False)
+try:
+    target.relative_to(home)
+except ValueError:
+    raise SystemExit("[tmux-which-key] XDG plugin path is outside of HOME: {}".format(target))
+
+print(target)
+' "$HOME" "$1" "$2"
+}
+
 case "$(tmux show-option -gvq @tmux-which-key-xdg-enable)" in
     1 | true)
         if [ -z "$HOME" ]; then
@@ -50,31 +77,16 @@ case "$(tmux show-option -gvq @tmux-which-key-xdg-enable)" in
         xdg_plugin_path=$(tmux show-option -gvq @tmux-which-key-xdg-plugin-path)
         xdg_plugin_path=${xdg_plugin_path:-tmux/plugins/tmux-which-key}
 
-        # create the config path if it doesn't exist, ensure it is inside
-        # $HOME, and simplify the path
-        xdg_config_path="$(realpath --relative-to="$HOME" "$XDG_CONFIG_HOME")/$xdg_plugin_path"
-        case "$xdg_config_path" in
-            ../*)
-                echo "[tmux-which-key] XDG_CONFIG_HOME plugin path is outside of HOME: $HOME/$xdg_config_path"
-                exit 1
-                ;;
-        esac
-        make_xdg_path "$HOME/$xdg_config_path"
-
-        # create the data path if it doesn't exist, ensure it is inside
-        # $HOME, and simplify the path
-        xdg_data_path="$(realpath --relative-to="$HOME" "$XDG_DATA_HOME")/$xdg_plugin_path"
-        case "$xdg_data_path" in
-            ../*)
-                echo "[tmux-which-key] XDG_DATA_HOME plugin path is outside of HOME: $HOME/$xdg_data_path"
-                exit 1
-                ;;
-        esac
-        make_xdg_path "$HOME/$xdg_data_path"
+        # Create XDG paths if they don't exist, and ensure they stay inside
+        # $HOME.  macOS realpath does not support GNU --relative-to.
+        xdg_config_path="$(home_relative_path "$XDG_CONFIG_HOME" "$xdg_plugin_path")"
+        xdg_data_path="$(home_relative_path "$XDG_DATA_HOME" "$xdg_plugin_path")"
+        make_xdg_path "$xdg_config_path"
+        make_xdg_path "$xdg_data_path"
 
         # use the XDG paths
-        config_file="$HOME/$xdg_config_path/config.yaml"
-        init_file="$HOME/$xdg_data_path/init.tmux"
+        config_file="$xdg_config_path/config.yaml"
+        init_file="$xdg_data_path/init.tmux"
         ;;
 esac
 
