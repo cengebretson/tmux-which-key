@@ -292,6 +292,18 @@ You can customize the action menu by editing `plugin/init.tmux` directly.
 > I strongly recommend using the YAML config to customize your action menu because
 > editing tmux script can be error-prone and difficult to debug.
 
+## 🧪 Development
+
+Run the local check suite with:
+
+```sh
+make test
+```
+
+This runs the Python unit tests, validates the example config, checks
+`plugin.sh.tmux` with ShellCheck when available, and sources generated tmux
+script in a throwaway tmux server.
+
 ### Zsh
 
 You can open tmux-which-key from the command line by running its tmux alias:
