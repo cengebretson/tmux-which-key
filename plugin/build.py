@@ -47,6 +47,11 @@ _DuplicateKeyLoader.add_constructor(
 
 special_key_chars: List[str] = ['~']
 
+# Macro names the plugin defines for itself. The menu keybindings invoke these,
+# so a user macro reusing one of these names would silently shadow it (two
+# command-alias entries with the same name) and break the menu.
+reserved_macro_names: List[str] = ['show-wk-menu', 'show-wk-menu-root']
+
 
 def escape_tmux_string(s: str) -> str:
     '''Escape a string for use inside a tmux double-quoted string.'''
@@ -239,7 +244,13 @@ class MenuItem(object):
             if has_special_key_char:
                 self.key = '"{}"'.format(self.key)
 
-        if self.menu:
+        # Check separator first: a separator carrying a command/macro/menu would
+        # otherwise fall into those branches and be silently rendered as a bare
+        # separator (dropping the extra field).
+        if self.separator:
+            if self.key or self.menu or self.macro or self.command:
+                raise ConfigError('separator items must not have other fields')
+        elif self.menu:
             if not self.name or self.macro or self.command:
                 raise ConfigError('submenu item must have only a name, key, and menu')
             if len(self.menu) == 0:
@@ -256,9 +267,6 @@ class MenuItem(object):
         elif self.command:
             if self.menu or self.macro:
                 raise ConfigError('item "{}" must have only one of: menu, macro, command'.format(self.name))
-        elif self.separator:
-            if self.key or self.menu or self.macro or self.command:
-                raise ConfigError('separator items must not have other fields')
         else:
             raise ConfigError('item "{}" must have one of: menu, macro, command'.format(self.name))
 
@@ -322,6 +330,9 @@ class Config(object):
         self.title = title
         self.position = Position(**position)
 
+        # The @wk_cfg_key_* options are emitted for introspection and for parity
+        # with the hand-written init.example.tmux (which binds keys via these
+        # options); the generated keybindings below use the literal keys.
         opts = {
             'wk_cfg_key_root_table': self.keybindings.root_table,
             'wk_cfg_key_prefix_table': self.keybindings.prefix_table,
@@ -336,6 +347,14 @@ class Config(object):
 
         self.custom_variables = [CustomVariable(
             v['name'], v['value']) for v in custom_variables]
+
+        for m in macros:
+            if m.get('name') in reserved_macro_names:
+                raise ConfigError(
+                    'macro name "{}" is reserved by the plugin. '
+                    'Reserved names: {}'.format(
+                        m['name'], ', '.join(reserved_macro_names))
+                )
 
         macros = [{
             'name': 'show-wk-menu',

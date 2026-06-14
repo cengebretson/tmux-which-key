@@ -78,6 +78,67 @@ class BuildTest(unittest.TestCase):
                 ]
             )
 
+    def test_transient_item_reshows_parent_menu(self):
+        generated = str(
+            self.make_config(
+                items=[
+                    {
+                        "name": "+Resize",
+                        "key": "r",
+                        "menu": [
+                            {
+                                "name": "Left",
+                                "key": "h",
+                                "command": "resizep -L",
+                                "transient": True,
+                            }
+                        ],
+                    }
+                ]
+            )
+        )
+
+        self.assertIn("resizep -L ; show-wk-menu #{@wk_menu_resize}", generated)
+
+    def test_separator_renders_as_empty_string_entry(self):
+        generated = str(
+            self.make_config(
+                items=[
+                    {"name": "Run", "key": "r", "command": "display run"},
+                    {"separator": True},
+                ]
+            )
+        )
+
+        # The menu option holds an escaped entry list ending in a "" separator.
+        self.assertIn('set -g @wk_menu_root "Run r \\"display run\\" \\"\\""', generated)
+
+    def test_separator_rejects_other_fields(self):
+        with self.assertRaisesRegex(build.ConfigError, "separator"):
+            self.make_config(items=[{"separator": True, "command": "display x"}])
+
+    def test_invalid_position_is_rejected(self):
+        with self.assertRaisesRegex(build.ConfigError, "position.x"):
+            self.make_config(position={"x": "Z", "y": "P"})
+        with self.assertRaisesRegex(build.ConfigError, "position.y"):
+            self.make_config(position={"x": "R", "y": "Z"})
+
+    def test_command_alias_start_index_floor_is_enforced(self):
+        with self.assertRaisesRegex(build.ConfigError, "must be >= 200"):
+            self.make_config(command_alias_start_index=199)
+
+    def test_reserved_macro_name_is_rejected(self):
+        with self.assertRaisesRegex(build.ConfigError, "reserved"):
+            self.make_config(
+                macros=[{"name": "show-wk-menu", "commands": ["display x"]}]
+            )
+
+    def test_unknown_macro_reference_is_rejected(self):
+        with self.assertRaisesRegex(build.ConfigError, "unknown macro"):
+            self.make_config(
+                items=[{"name": "Go", "key": "g", "macro": "does-not-exist"}]
+            )
+
     def test_validate_reads_yaml_and_rejects_duplicate_keys(self):
         with tempfile.NamedTemporaryFile("w", suffix=".yaml") as config_file:
             config_file.write(

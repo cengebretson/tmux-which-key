@@ -9,7 +9,21 @@ set -e
 # this file has the "tmux" extension despite being a shell script.
 #
 
-root_dir="$(dirname "$(readlink -f "$0")")"
+# Resolve $0 to an absolute path, following symlinks. BSD/macOS readlink only
+# gained `-f` in recent releases, so resolve links manually for portability.
+resolve_path() {
+    target="$1"
+    while [ -L "$target" ]; do
+        link="$(readlink "$target")"
+        case "$link" in
+            /*) target="$link" ;;
+            *) target="$(dirname "$target")/$link" ;;
+        esac
+    done
+    printf '%s\n' "$target"
+}
+
+root_dir="$(cd "$(dirname "$(resolve_path "$0")")" && pwd)"
 config_file="$root_dir/config.yaml"
 plugin_dir="$root_dir/plugin"
 init_file="$plugin_dir/init.tmux"
