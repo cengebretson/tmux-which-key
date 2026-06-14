@@ -139,6 +139,13 @@ set -g @plugin 'cengebretson/tmux-which-key'
 Hit `prefix` + <kbd>I</kbd> to install and load the plugin. You'll be presented
 with a wizard to complete the installation.
 
+By default TPM tracks the `main` branch. To pin to a specific release, append the
+tag to the plugin name:
+
+```tmux
+set -g @plugin 'cengebretson/tmux-which-key#v0.1.0'
+```
+
 ### Manual installation
 
 <!-- markdownlint-disable MD033 -->
