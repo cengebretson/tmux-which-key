@@ -78,3 +78,11 @@ Optional: `keybindings.root_table`, `title`, `position`, `custom_variables`, `ma
 Item types: `command` (single tmux command), `submenu` (nested `Menu`), `macro` (named sequence), separator (`-`).
 
 `transient: true` on an item re-shows the parent menu after execution (useful for resize loops).
+
+## Versioning and releases
+
+SemVer, with the current version in `VERSION` and notes in a Keep a Changelog `CHANGELOG.md`.
+
+**Keep the changelog current:** every user-facing change adds a bullet to the `## [Unreleased]` section of `CHANGELOG.md` in the same commit that makes the change. `git release` promotes and dates that section but does **not** author the notes — write them as work lands.
+
+Cut a release with the maintainer's `git release <x.y.z>` helper (bumps `VERSION`, promotes the changelog `[Unreleased]` section, runs the tests, commits, and tags) — or do those steps by hand. Pushing a `v*` tag triggers `.github/workflows/release.yml`, which re-runs the checks, verifies the tag matches `VERSION`, and publishes a GitHub release from that version's changelog section.
