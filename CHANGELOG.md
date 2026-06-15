@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.1] - 2026-06-15
+
 ### Added
 
 - A `VERSION` file and a tag-triggered release workflow that publishes a GitHub release from the changelog.
@@ -20,5 +22,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Test suite (`make test`: unit, config validation, ShellCheck, and an isolated
   tmux smoke check) and a CI workflow running it on Python 3.8 and 3.13.
 
-[Unreleased]: https://github.com/cengebretson/tmux-which-key/compare/v0.1.0...HEAD
+[Unreleased]: https://github.com/cengebretson/tmux-which-key/compare/v0.1.1...HEAD
+[0.1.1]: https://github.com/cengebretson/tmux-which-key/compare/v0.1.0...v0.1.1
 [0.1.0]: https://github.com/cengebretson/tmux-which-key/releases/tag/v0.1.0
