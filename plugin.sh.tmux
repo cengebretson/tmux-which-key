@@ -120,6 +120,7 @@ fi
 case "$(tmux show-option -gvq @tmux-which-key-disable-autobuild)" in
     1 | true) ;;
     *)
+        # shellcheck disable=SC3013  # -nt is supported by the shells tmux runs (dash/bash/busybox)
         if [ "$config_file" -nt "$init_file" ]; then
             echo "[tmux-which-key] Rebuilding menu ..."
             if command -v python3 >/dev/null; then
