@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- A `VERSION` file and a tag-triggered release workflow that publishes a GitHub release from the changelog.
+
 ## [0.1.0] - 2026-06-14
 
 ### Added
