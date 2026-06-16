@@ -22,11 +22,16 @@ tmux source-file plugin/init.tmux
 
 The Python version is pinned to 3.8 (see `.python-version`); PyYAML must be installed (`python3 -m pip install pyyaml`) — it is typically pre-installed on most systems.
 
-Run the Python tests with:
+Run the Python unit tests with:
 
 ```bash
 python3 -m unittest discover -s tests
 ```
+
+Or use the `Makefile`, which is what CI runs — `make test` chains `unit` (the unittest
+suite), `validate` (`build.py --validate config.example.yaml`, a parse/validate pass that
+emits no output), `shellcheck`, and `smoke` (a real build to a temp file). To validate a
+config without building, run `python3 plugin/build.py --validate config.yaml`.
 
 ## Architecture
 
@@ -34,6 +39,7 @@ python3 -m unittest discover -s tests
 plugin.sh.tmux      # TPM entry point — copies example configs, runs build.py, sources init.tmux
 plugin/build.py     # Python builder: parses config.yaml, emits tmux script
 config.example.yaml # User-facing config template (gitignored config.yaml is the live copy)
+config.schema.yaml  # JSON Schema for the config — editor/tooling validation, not wired into the build
 plugin/init.tmux    # Generated output — do not edit by hand (gitignored)
 ```
 
