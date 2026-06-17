@@ -126,7 +126,7 @@ Here are a few examples of the plugin in action:
 Requirements:
 
 - tmux>=3.0
-- python>=3.8 for YAML config rebuilds or XDG path support
+- python>=3.8 plus PyYAML for YAML config rebuilds or XDG path support
 
 ### TPM ([Tmux Plugin Manager](https://github.com/tmux-plugins/tpm/tree/master#installing-plugins))
 
@@ -136,14 +136,14 @@ Add the plugin to the list of TPM plugins in your `~/.tmux.conf`:
 set -g @plugin 'cengebretson/tmux-which-key'
 ```
 
-Hit `prefix` + <kbd>I</kbd> to install and load the plugin. You'll be presented
-with a wizard to complete the installation.
+Hit `prefix` + <kbd>I</kbd> to install and load the plugin. On first load, the
+plugin copies the example config into place and builds the tmux init script.
 
 By default TPM tracks the `main` branch. To pin to a specific release, append the
 tag to the plugin name:
 
 ```tmux
-set -g @plugin 'cengebretson/tmux-which-key#v0.1.0'
+set -g @plugin 'cengebretson/tmux-which-key#v0.1.1'
 ```
 
 ### Manual installation
@@ -193,9 +193,9 @@ Menus can be customized either by:
 > [!NOTE]
 >
 > This method requires python3 to be installed on your system. Most Unix systems
-> ship with it installed by default these days, so it shouldn't be a problem for
-> most users. If you don't have python3 installed and aren't willing to use it,
-> you'll need to edit `plugin/init.tmux` directly.
+> ship with it installed by default these days, but the builder also requires
+> PyYAML. If you don't have python3/PyYAML installed and aren't willing to use
+> them, you'll need to edit `plugin/init.tmux` directly.
 
 The default configuration is defined in `config.example.yaml`. Here's the
 structure:
@@ -307,9 +307,16 @@ Run the local check suite with:
 make test
 ```
 
-This runs the Python unit tests, validates the example config, checks
-`plugin.sh.tmux` with ShellCheck when available, and sources generated tmux
-script in a throwaway tmux server.
+This runs the Python unit tests, validates the example config, verifies
+`plugin/init.example.tmux` matches generated output, checks `plugin.sh.tmux`
+with ShellCheck when available, and sources generated tmux script in a throwaway
+tmux server.
+
+Validate a config without writing generated output:
+
+```sh
+python3 plugin/build.py --validate config.yaml
+```
 
 ### Zsh
 

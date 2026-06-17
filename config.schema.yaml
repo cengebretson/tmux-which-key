@@ -1,6 +1,7 @@
 $id: "http://example.com/config.schema.yaml"
 type: object
 title: The tmux-which-key plugin configuration
+additionalProperties: false
 $defs:
   item:
     type: object
@@ -12,6 +13,7 @@ $defs:
           - name
           - key
           - menu
+        additionalProperties: false
         properties:
           name:
             type: string
@@ -30,15 +32,19 @@ $defs:
               $ref: "#/$defs/item"
             examples: []
         examples:
-          - name: Last pane
-            key: Space
-            command: last-pane
+          - name: +My menu
+            key: C-m
+            menu:
+              - name: Last pane
+                key: Space
+                command: last-pane
       - type: object
         title: A macro defined by the user
         required:
           - name
           - key
           - macro
+        additionalProperties: false
         properties:
           name:
             type: string
@@ -67,13 +73,14 @@ $defs:
         examples:
           - name: My macro
             key: M
-            command: my-macro
+            macro: my-macro
       - type: object
         title: A command
         required:
           - name
           - key
           - command
+        additionalProperties: false
         properties:
           name:
             type: string
@@ -104,10 +111,11 @@ $defs:
         title: A menu separator
         required:
           - separator
+        additionalProperties: false
         properties:
           separator:
             type: boolean
-            default: true
+            const: true
             title: Whether the item is a separator
         examples:
           - separator: true
@@ -127,6 +135,7 @@ properties:
       - 200
   keybindings:
     type: object
+    additionalProperties: false
     default:
       prefix_table: Space
       root_table: C-Space
@@ -151,6 +160,7 @@ properties:
         root_table: C-Space
   title:
     type: object
+    additionalProperties: false
     title: The menu title config (optional)
     properties:
       style:
@@ -175,6 +185,7 @@ properties:
         prefix_style: "fg=green,align=centre,bold"
   position:
     type: object
+    additionalProperties: false
     default:
       x: R
       y: P
@@ -203,6 +214,7 @@ properties:
       tmux-only environment variables that can be used in commands and macros
     items:
       type: object
+      additionalProperties: false
       required:
         - name
         - value
@@ -223,6 +235,7 @@ properties:
     title: The user macros
     items:
       type: object
+      additionalProperties: false
       required:
         - name
         - commands
@@ -246,6 +259,10 @@ properties:
               - source-file -q "$HOME/.config/tmux/tmux.conf"
               - 'display -p "[info] Done\n\n... Press <Enter> to close"'
               - 'display "[info] Config loaded "'
+        expand_formats:
+          type: boolean
+          default: false
+          title: Whether tmux formats in the macro are expanded when the alias is defined
     examples:
       - - name: reload-config
           commands:

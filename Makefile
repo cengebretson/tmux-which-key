@@ -3,15 +3,21 @@ TMUX_BIN ?= tmux
 TMUX_SOCKET ?= tmux-which-key-test
 TMP_INIT ?= /tmp/tmux-which-key-init-test.tmux
 
-.PHONY: test unit validate build shellcheck smoke clean
+.PHONY: test unit validate generated-init build shellcheck smoke clean
 
-test: unit validate shellcheck smoke
+test: unit validate generated-init shellcheck smoke
 
 unit:
 	$(PYTHON) -m unittest discover -s tests
 
 validate:
 	$(PYTHON) plugin/build.py --validate config.example.yaml
+
+generated-init:
+	@tmp=$$(mktemp); \
+	trap 'rm -f "$$tmp"' EXIT HUP INT TERM; \
+	$(PYTHON) plugin/build.py config.example.yaml "$$tmp"; \
+	diff -u plugin/init.example.tmux "$$tmp"
 
 build:
 	$(PYTHON) plugin/build.py config.example.yaml $(TMP_INIT)

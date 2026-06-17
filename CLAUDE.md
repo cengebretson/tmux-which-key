@@ -30,8 +30,9 @@ python3 -m unittest discover -s tests
 
 Or use the `Makefile`, which is what CI runs — `make test` chains `unit` (the unittest
 suite), `validate` (`build.py --validate config.example.yaml`, a parse/validate pass that
-emits no output), `shellcheck`, and `smoke` (a real build to a temp file). To validate a
-config without building, run `python3 plugin/build.py --validate config.yaml`.
+emits no output), `generated-init` (checks `plugin/init.example.tmux` matches generated
+output), `shellcheck`, and `smoke` (a real build to a temp file). To validate a config
+without building, run `python3 plugin/build.py --validate config.yaml`.
 
 ## Architecture
 
@@ -40,7 +41,8 @@ plugin.sh.tmux      # TPM entry point — copies example configs, runs build.py,
 plugin/build.py     # Python builder: parses config.yaml, emits tmux script
 config.example.yaml # User-facing config template (gitignored config.yaml is the live copy)
 config.schema.yaml  # JSON Schema for the config — editor/tooling validation, not wired into the build
-plugin/init.tmux    # Generated output — do not edit by hand (gitignored)
+plugin/init.tmux    # User-local generated output — do not edit by hand (gitignored)
+plugin/init.example.tmux # Checked-in fallback generated from config.example.yaml
 ```
 
 ### Data flow
@@ -48,7 +50,8 @@ plugin/init.tmux    # Generated output — do not edit by hand (gitignored)
 1. On tmux start, `plugin.sh.tmux` runs.
 2. If `config.yaml` is missing, it copies `config.example.yaml` → `config.yaml`.
 3. Unless `@tmux-which-key-disable-autobuild` is set, it invokes `build.py`.
-4. `build.py` reads `config.yaml`, validates it, and writes `plugin/init.tmux`.
+4. `build.py` reads `config.yaml`, validates it, and writes `plugin/init.tmux`; on
+   first install, the plugin forces this rebuild when Python is available.
 5. `plugin.sh.tmux` sources `plugin/init.tmux` into tmux.
 
 ### build.py internals

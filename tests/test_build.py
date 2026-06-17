@@ -139,6 +139,35 @@ class BuildTest(unittest.TestCase):
                 items=[{"name": "Go", "key": "g", "macro": "does-not-exist"}]
             )
 
+    def test_duplicate_macro_name_is_rejected(self):
+        with self.assertRaisesRegex(build.ConfigError, 'duplicate macro name "again"'):
+            self.make_config(
+                macros=[
+                    {"name": "again", "commands": ["display one"]},
+                    {"name": "again", "commands": ["display two"]},
+                ],
+                items=[{"name": "Again", "key": "a", "macro": "again"}],
+            )
+
+    def test_nested_config_errors_are_reported_as_config_errors(self):
+        with self.assertRaisesRegex(build.ConfigError, "custom_variables\\[0\\].*value"):
+            self.make_config(custom_variables=[{"name": "log_info"}])
+
+        with self.assertRaisesRegex(build.ConfigError, "macros\\[0\\].*commands"):
+            self.make_config(macros=[{"name": "reload"}])
+
+        with self.assertRaisesRegex(build.ConfigError, 'menu "root" item 0.*unexpected'):
+            self.make_config(
+                items=[
+                    {
+                        "name": "Run",
+                        "key": "r",
+                        "command": "display run",
+                        "extra": True,
+                    }
+                ]
+            )
+
     def test_validate_reads_yaml_and_rejects_duplicate_keys(self):
         with tempfile.NamedTemporaryFile("w", suffix=".yaml") as config_file:
             config_file.write(

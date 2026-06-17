@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- Rebuild the generated tmux init script on first install when Python is available, keeping first-load keybindings in sync with `config.example.yaml`.
+- Keep `plugin/init.example.tmux` generated from `config.example.yaml` and check for drift in `make test`.
+- Report nested YAML config mistakes, duplicate macro names, and unknown fields as explicit config errors.
+
 ## [0.1.1] - 2026-06-15
 
 ### Added

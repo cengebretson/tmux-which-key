@@ -109,11 +109,16 @@ esac
 # Copy the default configs to the root directory if they don't exist yet. The
 # root files are gitignored so users can customize them without breaking git
 # updates.
+config_created=0
+init_created=0
+
 if [ ! -f "$config_file" ]; then
     cp "$root_dir/config.example.yaml" "$config_file"
+    config_created=1
 fi
 if [ ! -f "$init_file" ]; then
     cp "$plugin_dir/init.example.tmux" "$init_file"
+    init_created=1
 fi
 
 # If enabled, rebuild the menu from the user config.
@@ -121,7 +126,7 @@ case "$(tmux show-option -gvq @tmux-which-key-disable-autobuild)" in
     1 | true) ;;
     *)
         # shellcheck disable=SC3013  # -nt is supported by the shells tmux runs (dash/bash/busybox)
-        if [ "$config_file" -nt "$init_file" ]; then
+        if [ "$config_created" = 1 ] || [ "$init_created" = 1 ] || [ "$config_file" -nt "$init_file" ]; then
             echo "[tmux-which-key] Rebuilding menu ..."
             if command -v python3 >/dev/null; then
                 "$plugin_dir/build.py" "$config_file" "$init_file"
