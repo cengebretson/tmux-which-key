@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.2] - 2026-06-17
+
 ### Fixed
 
 - Rebuild the generated tmux init script on first install when Python is available, keeping first-load keybindings in sync with `config.example.yaml`.
@@ -28,6 +30,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Test suite (`make test`: unit, config validation, ShellCheck, and an isolated
   tmux smoke check) and a CI workflow running it on Python 3.8 and 3.13.
 
-[Unreleased]: https://github.com/cengebretson/tmux-which-key/compare/v0.1.1...HEAD
+[Unreleased]: https://github.com/cengebretson/tmux-which-key/compare/v0.1.2...HEAD
+[0.1.2]: https://github.com/cengebretson/tmux-which-key/compare/v0.1.1...v0.1.2
 [0.1.1]: https://github.com/cengebretson/tmux-which-key/compare/v0.1.0...v0.1.1
 [0.1.0]: https://github.com/cengebretson/tmux-which-key/releases/tag/v0.1.0
