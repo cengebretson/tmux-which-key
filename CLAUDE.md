@@ -20,7 +20,7 @@ After rebuilding, reload in a live tmux session:
 tmux source-file plugin/init.tmux
 ```
 
-The Python version is pinned to 3.8 (see `.python-version`); PyYAML must be installed (`python3 -m pip install pyyaml`) — it is typically pre-installed on most systems.
+Python 3.8 is the minimum supported version — CI tests a 3.8 + 3.13 matrix, and `.python-version` pins 3.8.16 so local version managers pick a compatible interpreter (version managers without 3.8 installed will fall through to a newer one, which is fine for running; just keep `build.py` 3.8-compatible). PyYAML is the only dependency and is **not** bundled with Python — install it with `python3 -m pip install pyyaml`.
 
 Run the Python unit tests with:
 
@@ -43,6 +43,8 @@ config.example.yaml # User-facing config template (gitignored config.yaml is the
 config.schema.yaml  # JSON Schema for the config — editor/tooling validation, not wired into the build
 plugin/init.tmux    # User-local generated output — do not edit by hand (gitignored)
 plugin/init.example.tmux # Checked-in fallback generated from config.example.yaml
+tests/test_build.py # Unit tests for build.py
+demo/*.tape         # VHS tapes that generate the README demo gifs
 ```
 
 ### Data flow
