@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Pre-commit config (`.pre-commit-config.yaml`) running `make test`; enable
+  with `pre-commit install`.
+
 ## [0.1.2] - 2026-06-17
 
 ### Fixed

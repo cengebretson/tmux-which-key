@@ -88,6 +88,12 @@ Item types: `command` (single tmux command), `submenu` (nested `Menu`), `macro` 
 
 `transient: true` on an item re-shows the parent menu after execution (useful for resize loops).
 
+## Pre-commit
+
+`.pre-commit-config.yaml` runs the same `make test` chain as CI. Enable it once
+with `pre-commit install` (requires [pre-commit](https://pre-commit.com), plus
+python3 with PyYAML and `shellcheck` on PATH).
+
 ## Versioning and releases
 
 SemVer, with the current version in `VERSION` and notes in a Keep a Changelog `CHANGELOG.md`.

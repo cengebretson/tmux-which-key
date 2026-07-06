@@ -1,0 +1,12 @@
+# Pre-commit hooks for tmux-which-key. Enable once with `pre-commit install`.
+# Requires the pre-commit framework (https://pre-commit.com) plus python3 (with
+# PyYAML) and shellcheck on PATH — the hook runs the same `make test` as CI.
+repos:
+  - repo: local
+    hooks:
+      - id: tmux-which-key-tests
+        name: tmux-which-key test suite (make test)
+        entry: make test
+        language: system
+        pass_filenames: false
+        always_run: true
