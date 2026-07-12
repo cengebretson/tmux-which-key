@@ -31,6 +31,15 @@ $defs:
             items:
               $ref: "#/$defs/item"
             examples: []
+          transient:
+            type: boolean
+            default: false
+            title: >-
+              Whether the parent menu is reopened after this submenu's command
+              runs (transient keybinding)
+            examples:
+              - false
+              - true
         examples:
           - name: +My menu
             key: C-m
@@ -165,6 +174,7 @@ properties:
     properties:
       style:
         type: string
+        default: "align=centre,bold"
         title: The title style
         examples:
           - "align=centre,bold"
@@ -176,6 +186,7 @@ properties:
           - tmux
       prefix_style:
         type: string
+        default: "fg=green,align=centre,bold"
         title: The style of the title prefix
         examples:
           - "fg=green,align=centre,bold"

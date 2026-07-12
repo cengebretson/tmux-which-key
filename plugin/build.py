@@ -305,7 +305,7 @@ class MenuItem(object):
         # otherwise fall into those branches and be silently rendered as a bare
         # separator (dropping the extra field).
         if self.separator:
-            if self.key or self.menu or self.macro or self.command:
+            if self.key or self.menu or self.macro or self.command or self.transient:
                 raise ConfigError('separator items must not have other fields')
         elif self.menu:
             if not self.name or self.macro or self.command:
@@ -395,12 +395,7 @@ class Config(object):
         self.title = title
         self.position = Position(**position)
 
-        # The @wk_cfg_key_* options are emitted for introspection and for parity
-        # with the hand-written init.example.tmux (which binds keys via these
-        # options); the generated keybindings below use the literal keys.
         opts = {
-            'wk_cfg_key_root_table': self.keybindings.root_table,
-            'wk_cfg_key_prefix_table': self.keybindings.prefix_table,
             'wk_cfg_title_style': title['style'],
             'wk_cfg_title_prefix': title['prefix'],
             'wk_cfg_title_prefix_style': title['prefix_style'],
@@ -541,8 +536,16 @@ def main() -> int:
 
     except ConfigError as e:
         raise SystemExit('[tmux-which-key] Config error: {}'.format(e))
+    except yaml.YAMLError as e:
+        raise SystemExit('[tmux-which-key] Config error: invalid YAML in {}: {}'.format(
+            args.config_file, e))
+    except OSError as e:
+        raise SystemExit('[tmux-which-key] Config error: cannot read {}: {}'.format(
+            args.config_file, e))
     except TypeError as e:
-        raise SystemExit('[tmux-which-key] Config error: unexpected field — {}'.format(e))
+        # Config(**data) raises TypeError for both missing required fields and
+        # unexpected top-level fields; Python's message says which.
+        raise SystemExit('[tmux-which-key] Config error: invalid top-level field(s) — {}'.format(e))
 
     if args.validate:
         logging.info('Config is valid')

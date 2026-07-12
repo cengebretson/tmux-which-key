@@ -116,6 +116,8 @@ class BuildTest(unittest.TestCase):
     def test_separator_rejects_other_fields(self):
         with self.assertRaisesRegex(build.ConfigError, "separator"):
             self.make_config(items=[{"separator": True, "command": "display x"}])
+        with self.assertRaisesRegex(build.ConfigError, "separator"):
+            self.make_config(items=[{"separator": True, "transient": True}])
 
     def test_invalid_position_is_rejected(self):
         with self.assertRaisesRegex(build.ConfigError, "position.x"):

@@ -7,6 +7,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- Report YAML syntax errors and unreadable config files as friendly
+  `[tmux-which-key] Config error:` messages instead of raw tracebacks, and stop
+  labeling every top-level config `TypeError` (including missing required
+  fields) as an "unexpected field".
+- Reject `transient: true` on separator items as a config error instead of
+  silently emitting a broken menu entry.
+- Sync `config.schema.yaml` with the builder: allow `transient` on submenu
+  items (the builder reopens the parent menu after the submenu command) and
+  document the applied defaults for `title.style` and `title.prefix_style`.
+
+### Removed
+
+- The dead `@wk_cfg_key_root_table` / `@wk_cfg_key_prefix_table` user options
+  from the generated init script; keybindings are emitted with literal keys
+  and nothing read these options.
+
 ## [0.1.3] - 2026-07-06
 
 ### Added
