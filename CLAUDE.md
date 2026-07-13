@@ -20,7 +20,7 @@ After rebuilding, reload in a live tmux session:
 tmux source-file plugin/init.tmux
 ```
 
-Python 3.8 is the minimum supported version — CI tests a 3.8 + 3.13 matrix, and `.python-version` pins 3.8.16 so local version managers pick a compatible interpreter (version managers without 3.8 installed will fall through to a newer one, which is fine for running; just keep `build.py` 3.8-compatible). PyYAML is the only dependency and is **not** bundled with Python — install it with `python3 -m pip install pyyaml`.
+Python 3.8 is the minimum supported version — CI tests a 3.8 + 3.13 matrix, and `.python-version` pins 3.8.16 so local version managers pick a compatible interpreter (version managers without 3.8 installed will fall through to a newer one, which is fine for running; just keep `build.py` 3.8-compatible). PyYAML is the only dependency and is **not** bundled with Python — install it with `python3 -m pip install pyyaml`. If `make test` (or `git release`, which runs it) fails with "PyYAML not found" and installing isn't an option, run the suite without touching the environment: `make test PYTHON="uv run --no-project --with pyyaml python3"`.
 
 Run the Python unit tests with:
 
