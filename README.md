@@ -143,7 +143,7 @@ By default TPM tracks the `main` branch. To pin to a specific release, append th
 tag to the plugin name:
 
 ```tmux
-set -g @plugin 'cengebretson/tmux-which-key#v0.1.1'
+set -g @plugin 'cengebretson/tmux-which-key#v0.2.0'
 ```
 
 ### Manual installation

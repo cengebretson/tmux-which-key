@@ -49,7 +49,7 @@ make_xdg_path() {
     IFS=$OLDIFS
 }
 
-home_relative_path() {
+resolve_path_in_home() {
     if ! command -v python3 >/dev/null; then
         echo "[tmux-which-key] python3 not found; XDG path resolution requires python3" >&2
         return 1
@@ -93,8 +93,8 @@ case "$(tmux show-option -gvq @tmux-which-key-xdg-enable)" in
 
         # Create XDG paths if they don't exist, and ensure they stay inside
         # $HOME.  macOS realpath does not support GNU --relative-to.
-        xdg_config_path="$(home_relative_path "$XDG_CONFIG_HOME" "$xdg_plugin_path")"
-        xdg_data_path="$(home_relative_path "$XDG_DATA_HOME" "$xdg_plugin_path")"
+        xdg_config_path="$(resolve_path_in_home "$XDG_CONFIG_HOME" "$xdg_plugin_path")"
+        xdg_data_path="$(resolve_path_in_home "$XDG_DATA_HOME" "$xdg_plugin_path")"
         make_xdg_path "$xdg_config_path"
         make_xdg_path "$xdg_data_path"
 

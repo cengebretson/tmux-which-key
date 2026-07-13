@@ -69,12 +69,15 @@ _DuplicateKeyLoader.add_constructor(
     _construct_mapping,
 )
 
-special_key_chars: List[str] = ['~']
-
 # Macro names the plugin defines for itself. The menu keybindings invoke these,
 # so a user macro reusing one of these names would silently shadow it (two
 # command-alias entries with the same name) and break the menu.
 reserved_macro_names: List[str] = ['show-wk-menu', 'show-wk-menu-root']
+
+
+def _is_safe_char(c: str) -> bool:
+    '''True for characters safe to emit unquoted in tmux: alphanumerics, - and _.'''
+    return c.isalnum() or c in '-_'
 
 
 def escape_tmux_string(s: str) -> str:
@@ -152,7 +155,7 @@ display -p '[tmux-which-key] Done'
 def add_quotes(s: str) -> str:
     '''Wraps s in quotes if it has any whitespace or special chars, escaping
     existing double-quotes.'''
-    if all(c.isalnum() or c in ['-', '_'] for c in s):
+    if all(_is_safe_char(c) for c in s):
         return s
 
     return quote_tmux_string(s)
@@ -241,7 +244,7 @@ class Macro(object):
             raise ConfigError('macro name must be a string')
         if not isinstance(self.expand_formats, bool):
             raise ConfigError('macro "{}" expand_formats must be a boolean'.format(self.name))
-        if not all(c.isalnum() or c in ['-', '_'] for c in self.name):
+        if not all(_is_safe_char(c) for c in self.name):
             raise ConfigError('macro has invalid name: "{}". Names must be alphanumeric with - or _'.format(self.name))
         if not isinstance(self.commands, list):
             raise ConfigError('macro "{}" must have a commands list'.format(self.name))
@@ -291,15 +294,11 @@ class MenuItem(object):
 
             if not self.key:
                 raise ConfigError('item "{}" is missing a key'.format(self.name))
-            # Escape special key characters.
-            has_special_key_char = False
-            for k in special_key_chars:
-                if k in self.key:
-                    has_special_key_char = True
-                    self.key = self.key.replace(k, '\\{}'.format(k))
-
-            if has_special_key_char:
-                self.key = '"{}"'.format(self.key)
+            # Escape special key characters. `~` is the only one so far: tmux
+            # tilde-expands an unquoted ~ while parsing, so it must be escaped
+            # and quoted. Handle any future special key chars here.
+            if '~' in self.key:
+                self.key = '"{}"'.format(self.key.replace('~', '\\~'))
 
         # Check separator first: a separator carrying a command/macro/menu would
         # otherwise fall into those branches and be silently rendered as a bare
@@ -314,7 +313,7 @@ class MenuItem(object):
                 raise ConfigError('submenu "{}" has no items'.format(self.name))
             # Assign an alphanumeric menu ID for use in tmux user options.
             self.menu_id = ''.join(
-                [c for c in self.name if c.isalnum() or c in ['-', '_']]).lower()
+                [c for c in self.name if _is_safe_char(c)]).lower()
             self.command = 'show-wk-menu #{{@wk_menu_{}}}'.format(
                 self.menu_id)
         elif self.macro:
@@ -402,8 +401,8 @@ class Config(object):
             'wk_cfg_pos_x': self.position.x,
             'wk_cfg_pos_y': self.position.y,
         }
-        self.user_options = [UserOption(name=k, value=opts[k])
-                             for k in opts if opts[k]]
+        self.user_options = [UserOption(name=k, value=v)
+                             for k, v in opts.items() if v]
 
         if not isinstance(custom_variables, list):
             raise ConfigError('custom_variables must be a list')
@@ -452,7 +451,7 @@ class Config(object):
         )
                        for i, m in enumerate(macros)]
 
-        self.macro_names = set([m.name for m in self.macros])
+        self.macro_names = {m.name for m in self.macros}
         self.menu_ids = set()
         self.menus = []
         self.register_menu('root', 'root', items)
@@ -552,7 +551,7 @@ def main() -> int:
         return 0
 
     out = str(config)
-    with open(args.output_file, 'w+') as output_file:
+    with open(args.output_file, 'w') as output_file:
         output_file.write(out)
 
     logging.info('Done')

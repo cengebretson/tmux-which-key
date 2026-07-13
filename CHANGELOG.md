@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- Internal cleanup: deduplicate the safe-character predicate in
+  `plugin/build.py`, simplify a few idioms, and rename
+  `home_relative_path` to `resolve_path_in_home` in `plugin.sh.tmux`
+  (it returns an absolute path validated to be inside `$HOME`).
+  No change to generated `init.tmux` output.
+- Bump the README plugin pin example to `v0.2.0`.
+
 ## [0.2.0] - 2026-07-12
 
 ### Fixed
