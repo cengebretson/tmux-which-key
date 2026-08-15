@@ -7,6 +7,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Warn at load time when `keybindings.root_table` is also the tmux prefix key.
+  tmux consumes the prefix before consulting the root table, so such a binding
+  can never fire and the menu silently fails to open on the configured key —
+  which the shipped `C-Space` default does for anyone whose prefix is `C-Space`.
+  The binding is still created; only a warning is added.
+
+### Fixed
+
+- Make the `smoke` target actually assert that the keybindings exist. On tmux
+  >= 3.7 the trailing key-filter form (`list-keys -Troot C-Space`) exits 0
+  whether or not the key is bound, so both binding assertions were no-ops that
+  only checked the key name parsed. They now grep the full table.
+
 ## [0.3.0] - 2026-07-12
 
 ### Changed

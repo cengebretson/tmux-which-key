@@ -207,7 +207,7 @@ command_alias_start_index: 200
 # The keybindings that open the action menu (required)
 keybindings:
   prefix_table: Space # The keybinding for the prefix key table (required)
-  root_table: C-Space # The keybinding for the root key table (optional)
+  root_table: C-Space # The keybinding for the root key table (optional, must not be your prefix)
 # The menu title config (optional)
 title:
   style: align=centre,bold # The title style
@@ -245,6 +245,16 @@ items:
         command: nextl
         transient: true # Whether to keep the menu open until ESC is pressed
 ```
+
+> [!IMPORTANT]
+>
+> `keybindings.root_table` must not be the same key as your tmux prefix. tmux
+> matches the prefix first and never consults the root table for that key, so
+> the binding is created but can never fire — the menu simply does not open.
+> The shipped default is `C-Space`, which collides for anyone who uses
+> `C-Space` as their prefix; pick another key (or open the menu with
+> `prefix` + <kbd>Space</kbd>). The plugin prints a warning at load time when
+> it detects the collision.
 
 #### User options
 

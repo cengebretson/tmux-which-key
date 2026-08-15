@@ -70,6 +70,7 @@ set -g command-alias[203] restart-pane="display \"#{log_info} Restarting pane\" 
 
 display -p "[tmux-which-key] Binding root table key to C-Space ..."
 bind-key -Troot C-Space show-wk-menu-root
+if -F "#{==:#{prefix},C-Space}" "display -p \"[tmux-which-key] Warning: root_table key C-Space is also the tmux prefix, so the root binding cannot fire. Change keybindings.root_table or your prefix.\""
 
 display -p "[tmux-which-key] Binding prefix table key to Space ..."
 bind-key -Tprefix Space show-wk-menu-root

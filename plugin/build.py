@@ -175,15 +175,39 @@ class Keybindings(object):
             raise ConfigError('keybindings.prefix_table is required')
 
     def __str__(self) -> str:
-        return '\n\n'.join(['\n'.join([
-            'display -p {}'.format(quote_tmux_string(
-                '[tmux-which-key] Binding {} table key to {} ...'.format(table, key)
-            )),
-            'bind-key -T{} {} show-wk-menu-root'.format(table, add_quotes(key))
-        ]) for table, key in [
+        return '\n\n'.join(['\n'.join(
+            [
+                'display -p {}'.format(quote_tmux_string(
+                    '[tmux-which-key] Binding {} table key to {} ...'.format(table, key)
+                )),
+                'bind-key -T{} {} show-wk-menu-root'.format(table, add_quotes(key))
+            ] + self._prefix_collision_warning(table, key)
+        ) for table, key in [
             ('root', self.root_table),
             ('prefix', self.prefix_table),
         ] if key])
+
+    @staticmethod
+    def _prefix_collision_warning(table: str, key: str) -> List[str]:
+        '''Warn at load time when the root-table key is also the tmux prefix.
+
+        tmux consumes the prefix key before it ever consults the root table, so
+        such a binding can never fire — the menu silently does not open on the
+        key the config claims. The prefix is only known at runtime (the user may
+        set it after this script is sourced, or never), so this has to be a tmux
+        conditional rather than a build-time check.
+        '''
+        if table != 'root':
+            return []
+
+        return ['if -F {} {}'.format(
+            quote_tmux_string('#{{==:#{{prefix}},{}}}'.format(key)),
+            quote_tmux_string('display -p {}'.format(quote_tmux_string(
+                '[tmux-which-key] Warning: root_table key {} is also the tmux '
+                'prefix, so the root binding cannot fire. Change '
+                'keybindings.root_table or your prefix.'.format(key)
+            )))
+        )]
 
 
 @dataclass

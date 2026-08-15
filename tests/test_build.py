@@ -55,6 +55,29 @@ class BuildTest(unittest.TestCase):
         self.assertIn("bind-key -Tprefix Space show-wk-menu-root", generated)
         self.assertNotIn("run-shell \"tmux bind-key", generated)
 
+    def test_root_table_emits_prefix_collision_warning(self):
+        generated = str(
+            self.make_config(
+                keybindings={"root_table": "C-Space", "prefix_table": "Space"}
+            )
+        )
+
+        # The binding is still emitted — the guard warns, it does not silently
+        # drop the user's configured key.
+        self.assertIn("bind-key -Troot C-Space show-wk-menu-root", generated)
+        self.assertIn('if -F "#{==:#{prefix},C-Space}"', generated)
+        self.assertIn("is also the tmux prefix", generated)
+
+    def test_prefix_table_has_no_collision_warning(self):
+        # Only the root table can collide: a prefix-table key is reached
+        # *through* the prefix, so matching it is normal rather than broken.
+        generated = str(
+            self.make_config(keybindings={"prefix_table": "Space"})
+        )
+
+        self.assertIn("bind-key -Tprefix Space show-wk-menu-root", generated)
+        self.assertNotIn("is also the tmux prefix", generated)
+
     def test_tmux_strings_escape_quotes_backslashes_and_newlines(self):
         config = self.make_config(
             title={"prefix": 'tmux "quoted" \\ menu', "style": "bold", "prefix_style": "fg=green"},

@@ -1,6 +1,10 @@
 ---
 command_alias_start_index: 200
 keybindings:
+  # Must not equal your tmux prefix: tmux consumes the prefix before it consults
+  # the root table, so a root binding on the prefix key can never fire. The
+  # plugin warns at load time if these collide. Change this if your prefix is
+  # C-Space (the tmux default prefix is C-b, which does not collide).
   root_table: C-Space
   prefix_table: Space
 title:

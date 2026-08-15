@@ -35,8 +35,8 @@ smoke: build
 		"$$TMUX_BIN" -L "$$TMUX_SOCKET" -f /dev/null new-session -d; \
 		trap '\''"$$TMUX_BIN" -L "$$TMUX_SOCKET" kill-server >/dev/null 2>&1 || true'\'' EXIT; \
 		"$$TMUX_BIN" -L "$$TMUX_SOCKET" source-file "$$TMP_INIT"; \
-		"$$TMUX_BIN" -L "$$TMUX_SOCKET" list-keys -Troot C-Space >/dev/null; \
-		"$$TMUX_BIN" -L "$$TMUX_SOCKET" list-keys -Tprefix Space >/dev/null; \
+		"$$TMUX_BIN" -L "$$TMUX_SOCKET" list-keys -Troot | grep -qE "^bind-key +-T root C-Space +display-menu"; \
+		"$$TMUX_BIN" -L "$$TMUX_SOCKET" list-keys -Tprefix | grep -qE "^bind-key +-T prefix Space +display-menu"; \
 		"$$TMUX_BIN" -L "$$TMUX_SOCKET" show-options -gqv command-alias | grep -F "restart-pane=display \"#{log_info} Restarting pane\" ; respawnp -k -c #{pane_current_path}" >/dev/null; \
 	'
 
