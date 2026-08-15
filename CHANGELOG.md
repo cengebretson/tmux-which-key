@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.4.0] - 2026-08-15
+
 ### Added
 
 - Warn at load time when `keybindings.root_table` is also the tmux prefix key.
@@ -83,7 +85,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Test suite (`make test`: unit, config validation, ShellCheck, and an isolated
   tmux smoke check) and a CI workflow running it on Python 3.8 and 3.13.
 
-[Unreleased]: https://github.com/cengebretson/tmux-which-key/compare/v0.3.0...HEAD
+[Unreleased]: https://github.com/cengebretson/tmux-which-key/compare/v0.4.0...HEAD
+[0.4.0]: https://github.com/cengebretson/tmux-which-key/compare/v0.3.0...v0.4.0
 [0.3.0]: https://github.com/cengebretson/tmux-which-key/compare/v0.2.0...v0.3.0
 [0.2.0]: https://github.com/cengebretson/tmux-which-key/compare/v0.1.3...v0.2.0
 [0.1.3]: https://github.com/cengebretson/tmux-which-key/compare/v0.1.2...v0.1.3
